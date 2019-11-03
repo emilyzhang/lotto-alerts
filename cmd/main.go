@@ -1,7 +1,15 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"os"
+
+	"github.com/emilyzhang/lotto-alerts/pkg/scraper"
+	"github.com/emilyzhang/lotto-alerts/pkg/sms"
+)
 
 func main() {
-	fmt.Printf("hello, world\n")
+	games := scraper.Scrape("http://calottery.com")
+	fmt.Println(games)
+	sms.Send(games[0].String(), os.Getenv("PHONE_NUMBER"))
 }
