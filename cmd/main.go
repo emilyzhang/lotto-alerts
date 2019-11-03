@@ -6,17 +6,24 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/emilyzhang/lotto-alerts/pkg/scraper"
 	"github.com/emilyzhang/lotto-alerts/pkg/sms"
 )
 
-func main() {
+// HandleRequest handles a lambda request.
+func HandleRequest() ([]scraper.Lottery, error) {
 	lotteries := scraper.Scrape("http://calottery.com")
 	target, err := strconv.Atoi(os.Getenv("TARGET"))
 	if err != nil {
 		fmt.Println("Could not convert string to integer:", os.Getenv("TARGET"))
 	}
 	alert(lotteries, os.Getenv("PHONE_NUMBER"), target)
+	return lotteries, nil
+}
+
+func main() {
+	lambda.Start(HandleRequest)
 }
 
 func alert(lotteries []scraper.Lottery, num string, target int) {
@@ -42,3 +49,13 @@ func alert(lotteries []scraper.Lottery, num string, target int) {
 		send = false
 	}
 }
+
+// Old main function, before this was a lambda function.
+// func main() {
+// 	lotteries := scraper.Scrape("http://calottery.com")
+// 	target, err := strconv.Atoi(os.Getenv("TARGET"))
+// 	if err != nil {
+// 		fmt.Println("Could not convert string to integer:", os.Getenv("TARGET"))
+// 	}
+// 	alert(lotteries, os.Getenv("PHONE_NUMBER"), target)
+// }
