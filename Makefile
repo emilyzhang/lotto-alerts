@@ -31,3 +31,10 @@ setup:
 	@echo "--> Installing development tools"
 	curl -sfL https://install.goreleaser.com/github.com/golangci/golangci-lint.sh | sh -s -- -b $(BIN_DIR) v1.16.0
 	go get -u $(GOTOOLS)
+
+.PHONY: lambda
+lambda:
+	@echo "--> Building for lambda"
+	GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -o ./lotto-alerts ./cmd
+	zip function.zip lotto-alerts
+	rm lotto-alerts
